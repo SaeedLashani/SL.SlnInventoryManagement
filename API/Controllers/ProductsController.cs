@@ -36,5 +36,25 @@ namespace API.Controllers
                 new Application.Products.Queries.GetProductById.Query() { Id = id }, cancellationToken);
             return Ok(product);
         }
+
+        [HttpPatch("{id:guid}/stock-in")]
+        public async Task<IActionResult> StockIn(Guid id,Application.Products.Commands.StockIn.Command command,
+            CancellationToken cancelletionToken)
+        {
+            command.ProductId = id;
+            await _sender.Send(command, cancelletionToken);
+
+            return NoContent();
+        }
+
+        [HttpPatch("{id:guid}/stock-out")]
+        public async Task<IActionResult> StockOut(Guid id,
+            Application.Products.Commands.StackOut.Command command, CancellationToken cancellationToken)
+        {
+            command.ProductId = id;
+            await _sender.Send(command, cancellationToken);
+
+            return NoContent();
+        }
     }
 }
