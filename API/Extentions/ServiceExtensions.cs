@@ -1,5 +1,7 @@
-﻿using Application.Interfaces;
+﻿using Application.Common.Behaviors;
+using Application.Interfaces;
 using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contaxt;
 using Persistence.Repositories;
@@ -12,8 +14,12 @@ namespace API.Extentions
             this IServiceCollection services)
         {
             services.AddMediatR(cfg =>
+            {
                 cfg.RegisterServicesFromAssembly(
-                    typeof(Application.Products.Commands.Create.Command).Assembly));
+                    typeof(Application.Products.Commands.Create.Command).Assembly);
+
+                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            });
 
             services.AddValidatorsFromAssembly(
                 typeof(Application.Products.Commands.Create.Command).Assembly);
