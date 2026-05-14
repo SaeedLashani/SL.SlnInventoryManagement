@@ -7,9 +7,7 @@ namespace API.Middelware
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
-        public ExceptionHandlingMiddleware(
-            RequestDelegate next,
-            ILogger<ExceptionHandlingMiddleware> logger)
+        public ExceptionHandlingMiddleware(RequestDelegate next,ILogger<ExceptionHandlingMiddleware> logger)
         {
             _next = next;
             _logger = logger;
@@ -28,26 +26,16 @@ namespace API.Middelware
             }
         }
 
-        private static async Task HandleExceptionAsync(
-            HttpContext context, Exception exception)
+        private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             var (statusCode, message) = exception switch
             {
-                ValidationException ex => (
-                    StatusCodes.Status400BadRequest,
-                    ex.Errors.Select(e => e.ErrorMessage)),
+                ValidationException ex => (StatusCodes.Status400BadRequest,ex.Errors.Select(e => e.ErrorMessage)),
 
-                KeyNotFoundException => (
-                    StatusCodes.Status404NotFound,
-                    new[] { exception.Message }),
+                KeyNotFoundException => (StatusCodes.Status404NotFound, new[] { exception.Message }),
 
-                InvalidOperationException => (
-                    StatusCodes.Status400BadRequest,
-                    new[] { exception.Message }),
-
-                _ => (
-                    StatusCodes.Status500InternalServerError,
-                    new[] { "An unexpected error occurred" })
+                InvalidOperationException => (StatusCodes.Status400BadRequest,new[] { exception.Message }),
+                _ => (StatusCodes.Status500InternalServerError,new[] { "An unexpected error occurred" })
             };
 
             context.Response.ContentType = "application/json";
