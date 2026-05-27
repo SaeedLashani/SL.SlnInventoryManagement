@@ -11,9 +11,12 @@ namespace Application.Products.Commands.StackOut
     public class Handler:IRequestHandler<Command,Unit>
     {
         private readonly IProductRepository _repository;
-        public Handler(IProductRepository repository)
+        private readonly ICacheService _cache;
+        private const string CacheKey = "products:all";
+        public Handler(IProductRepository repository, ICacheService cache)
         {
             _repository = repository;
+            _cache = cache;
         }
 
         public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
@@ -26,6 +29,9 @@ namespace Application.Products.Commands.StackOut
             product.RemoveStock(request.Quantity);
 
             await _repository.UpdateAsync(product, cancellationToken);
+
+            await _cache.RemoveAsync(CacheKey, cancellationToken);
+            await _cache.RemoveAsync($"products:{request.ProductId}", cancellationToken);
 
             return Unit.Value;
         }

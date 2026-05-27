@@ -37,6 +37,11 @@ namespace API.Extentions
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<ICacheService, CacheService>();
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = configuration["Redis:Connection"];
+            });
             return services;
         }
 

@@ -9,23 +9,31 @@ using MediatR;
 
 namespace Application.Products.Queries.GetProductById
 {
-    public class Handler:IRequestHandler<Query, Response>
+    public class Handler : IRequestHandler<Query, Response>
     {
         private readonly IProductRepository _repository;
+        private readonly ICacheService _cache;
 
-        public Handler(IProductRepository repository)
+        public Handler(IProductRepository repository, ICacheService cache)
         {
             _repository = repository;
+            _cache = cache;
         }
 
-        public async Task<Response> Handle(Query request,CancellationToken cancellationToken)
+        public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
-            var product = await _repository.GetByIdAsync(
-            request.Id, cancellationToken);
+            string CacheKey = $"products:{request.Id}";
+            var cached = await _cache.GetAsync<Response>(CacheKey, cancellationToken);
+
+            if (cached is not null)
+                return cached;
+
+            var product = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
             if (product is null)
                 throw new KeyNotFoundException($"Product {request.Id} not found");
-            return new Response
+
+            var response = new Response
             {
                 Id = product.Id,
                 Name = product.Name,
@@ -35,6 +43,10 @@ namespace Application.Products.Queries.GetProductById
                 Description = product.Description,
                 CreatedAt = product.CreatedAt
             };
+
+            await _cache.SetAsync(CacheKey, response,TimeSpan.FromMinutes(5), cancellationToken);
+
+            return response;
         }
     }
 }
