@@ -58,5 +58,12 @@ namespace API.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("searchInElastic")]
+        public async Task<IActionResult> Search([FromQuery] string query,CancellationToken cancellationToken)
+        {
+            var results = await _sender.Send(new Application.Products.Queries.SearchInElastic.Query() {query=query },cancellationToken);
+            return Ok(results);
+        }
     }
 }

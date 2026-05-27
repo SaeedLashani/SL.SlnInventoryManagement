@@ -12,12 +12,14 @@ namespace Application.Products.Commands.StockIn
     {
         private readonly IProductRepository _repository;
         private readonly ICacheService _cache;
+        private readonly ISearchService _searchService;
         private const string CacheKey = "products:all";
 
-        public Handler(IProductRepository repository, ICacheService cache)
+        public Handler(IProductRepository repository, ICacheService cache, ISearchService searchService)
         {
             _repository = repository;
             _cache = cache;
+            _searchService = searchService;
         }
         public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -32,6 +34,8 @@ namespace Application.Products.Commands.StockIn
 
             await _cache.RemoveAsync(CacheKey, cancellationToken);
             await _cache.RemoveAsync($"products:{request.ProductId}", cancellationToken);
+
+            await _searchService.IndexProductAsync(product, cancellationToken);
 
             return Unit.Value;
         }

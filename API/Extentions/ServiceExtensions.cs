@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Nest;
 using Persistence.Contaxt;
 using Persistence.Repositories;
 
@@ -42,6 +43,10 @@ namespace API.Extentions
             {
                 options.Configuration = configuration["Redis:Connection"];
             });
+
+            services.AddSingleton<IElasticClient>(new ElasticClient(new ConnectionSettings(new Uri(configuration["Elasticsearch:Url"]!)).DefaultIndex("products")));
+            services.AddScoped<ISearchService, SearchService>();
+
             return services;
         }
 
