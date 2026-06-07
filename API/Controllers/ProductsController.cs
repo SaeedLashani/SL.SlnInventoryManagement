@@ -65,5 +65,12 @@ namespace API.Controllers
             var results = await _sender.Send(new Application.Products.Queries.SearchInElastic.Query() {query=query },cancellationToken);
             return Ok(results);
         }
+
+        [HttpGet("version")]
+        [AllowAnonymous]
+        public IActionResult Version()
+        {
+            return Ok(new { version = "2.0", deployedAt = DateTime.UtcNow });
+        }
     }
 }
