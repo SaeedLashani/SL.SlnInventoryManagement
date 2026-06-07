@@ -1,4 +1,23 @@
 services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=inventory;Username=postgres;Password=password
+      - Redis__Connection=redis:6379
+      - Elasticsearch__Url=http://elasticsearch:9200
+      - Jwt__Secret=your-super-secret-key-min-32-characters!!
+      - Jwt__Issuer=SL.InventoryManagement
+      - Jwt__Audience=SL.InventoryManagement
+    depends_on:
+      - postgres
+      - redis
+      - elasticsearch
+
   postgres:
     image: postgres:16
     environment:
