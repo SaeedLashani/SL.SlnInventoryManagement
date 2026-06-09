@@ -31,13 +31,15 @@ A production-ready Inventory Management System built with Clean Architecture and
 
 ## Architecture
 
+```
 SL.InventoryManagement/
 ├── Domain          — Entities, business rules
 ├── Application     — CQRS, Commands, Queries, Validators
 ├── Infrastructure  — JWT, Redis, Elasticsearch
 ├── Persistence     — EF Core, Repositories, Migrations
 └── Presentation
-└── API         — Controllers, Middleware
+    └── API         — Controllers, Middleware
+```
 
 ## Getting Started
 
